@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="[&quot;zh-CN&quot;,&quot;default&quot;]" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>四子棋AI——α-β剪枝算法 | Hatiaa Blog</title><meta name="author" content="Hatiaa"><meta name="copyright" content="Hatiaa"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="在人工智能领域，博弈问题一直以来都是一类具有代表性的研究课题，博弈问题中一些新课题的提出，也不断的推动着人工智能学科的发展。 四子棋是一种典型的博弈游戏，实现四子棋 AI 需要用到剪枝算法、棋局评价、威胁检测与排除等算法。 四子棋游戏规则游戏双方分别持不同颜色的棋子，设 A 持白子，B 持黑子，以某一方为先手依次落子。假设 A 为先手，落子规则如下:在 M 行 N 列的棋盘中，棋手每次只能在每一列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="四子棋AI——α-β剪枝算法">
+<meta property="og:url" content="https://hatiaa.github.io/2024/05/23/%E5%9B%9B%E5%AD%90%E6%A3%8B-%CE%B1%CE%B2%E5%89%AA%E6%9E%9D/index.html">
+<meta property="og:site_name" content="Hatiaa Blog">
+<meta property="og:description" content="在人工智能领域，博弈问题一直以来都是一类具有代表性的研究课题，博弈问题中一些新课题的提出，也不断的推动着人工智能学科的发展。 四子棋是一种典型的博弈游戏，实现四子棋 AI 需要用到剪枝算法、棋局评价、威胁检测与排除等算法。 四子棋游戏规则游戏双方分别持不同颜色的棋子，设 A 持白子，B 持黑子，以某一方为先手依次落子。假设 A 为先手，落子规则如下:在 M 行 N 列的棋盘中，棋手每次只能在每一列">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hatiaa.github.io/images/posts/connect-four-alpha-beta/cover.jpg">
+<meta property="article:published_time" content="2024-05-23T15:55:26.000Z">
+<meta property="article:modified_time" content="2026-06-05T16:14:36.047Z">
+<meta property="article:author" content="Hatiaa">
+<meta property="article:tag" content="强化学习">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="α-β剪枝">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hatiaa.github.io/images/posts/connect-four-alpha-beta/cover.jpg"><link rel="shortcut icon" href="/images/site/favicon.png"><link rel="canonical" href="https://hatiaa.github.io/2024/05/23/%E5%9B%9B%E5%AD%90%E6%A3%8B-%CE%B1%CE%B2%E5%89%AA%E6%9E%9D/index.html"><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="/pluginsSrc/@fortawesome/fontawesome-free/css/all.min.css?v=6.5.1"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":200},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Hatiaa","link":"链接: ","source":"来源: Hatiaa Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'mediumZoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: '/pluginsSrc/@egjs/infinitegrid/dist/infinitegrid.min.js?v=4.11.1',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '四子棋AI——α-β剪枝算法',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-06-06 00:14:36'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.2.0"><link href="/lib/katex/katex.min.css" rel="stylesheet" /></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/site/avatar.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/posts/connect-four-alpha-beta/cover.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Hatiaa Blog"><span class="site-name">Hatiaa Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">四子棋AI——α-β剪枝算法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-23T15:55:26.000Z" title="发表于 2024-05-23 23:55:26">2024-05-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-06-05T16:14:36.047Z" title="更新于 2026-06-06 00:14:36">2026-06-06</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="四子棋AI——α-β剪枝算法"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>在人工智能领域，博弈问题一直以来都是一类具有代表性的研究课题，博弈问题中一些新课题的提出，也不断的推动着人工智能学科的发展。</p>
+<p>四子棋是一种典型的博弈游戏，实现四子棋 AI 需要用到剪枝算法、棋局评价、威胁检测与排除等算法。</p>
+<h1 id="四子棋游戏规则"><a href="#四子棋游戏规则" class="headerlink" title="四子棋游戏规则"></a>四子棋游戏规则</h1><p>游戏双方分别持不同颜色的棋子，设 A 持白子，B 持黑子，以某一方为先手依次落子。假设 A 为先手，落子规则如下:在 M 行 N 列的棋盘中，棋手每次只能在每一列当前的最底部落子，如图中的红点处所示，如果某一列己经落满，则不能在该列中落子。在图形界面中，如果在某一列的任意一个按钮上点击，会自动在该列的最低端落子。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/rule-move.png" alt="image-20240524001035023" style="zoom:50%;" /></p>
+<p>棋手的目标是在横向、纵向、两个斜向共四个方向中的任意一个方向上，使自己的棋子连成四个(或四个以上)，并阻止对方达到同样的企图。先形成四连子的一方获胜，如果直到棋盘落满双方都没能达到目标，则为平局。</p>
+<h1 id="规则扩展"><a href="#规则扩展" class="headerlink" title="规则扩展"></a>规则扩展</h1><p>对于某些大小的棋盘，四子棋是存在必胜策略的，因此扩展以下规则</p>
+<ul>
+<li><strong>棋盘的大小是随机的，而不是固定不变的，宽度和高度的范围均为[9:12]</strong></li>
+<li><strong>每次棋盘生成之后，会同时在棋盘上随机生成一个不可以落子的位置，如图中的红叉所示。</strong></li>
+</ul>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/rule-blocked-cell.png" alt="image-20240524001945227" style="zoom:50%;" /></p>
+<h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><p>本篇 Blog 主要讲解使用 α-β 剪枝实现的四子棋 AI，由于走步时间限制，且在不考虑剪枝的情况下，极小极大树的节点数量会随树的深度成指数级增长，因此最多实现到了 6 层，单步搜索时长不超过 0.5s。50 个测例 100 场对局最高胜率为 75%（性能远弱于蒙特卡洛树）。</p>
+<p>以下统一设棋盘 M 行 N 列，坐标原点位于棋盘左上角，行列均从 0 开始计数。</p>
+<p>α-β 剪枝的基础是极小极大算法，模仿人类下棋往前看多步的思考过程。</p>
+<p>极小极大方法维护一个节点树，每个节点代表一个走步。每个节点均有 N 个字节点，分别对应 N 列下一步可以走的位置。由于是双方对弈，因此相邻两层节点对应的棋手是不同的。对于 AI 而言，每次使用极小极大树搜索都是为了找下一步的最优解，因此每棵搜索树的根节点玩家都是对手，下一层都是 AI。</p>
+<h2 id="极小极大树"><a href="#极小极大树" class="headerlink" title="极小极大树"></a>极小极大树</h2><p>（图片来自网络，侵删）</p>
+<p>以下是一个典型的极小极大树，深度为 4，<strong>正方形代表先手（选择子节点中最大的）</strong>，<strong>圆形代表后手（选择子节点中最小的）</strong>，<strong>只有叶子节点才可以直接计算估值</strong>（详见估值函数部分）。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/minimax-tree.png" alt="极小极大树，深度为4" style="zoom:67%;" /></p>
+<p>我们使用深度优先搜索的方法对所有情况进行遍历，所以在计算完叶子结点的价值之后需要往上回溯计算父节点的价值。如下图，倒数第二层是对方走步，所以需要选择子节点中最小的那个，如下图红色数字：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/minimax-backtrack-1.png" alt="image-20240525224511244" style="zoom:67%;" /></p>
+<p>同理得再往上一层需要选倒数第二层中最大的</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/minimax-backtrack-2.png" alt="image-20240525225401298" style="zoom:67%;" /></p>
+<p>下一步同理选择最小的子节点，直到到达根节点</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/minimax-backtrack-3.png" alt="image-20240525225606038" style="zoom: 67%;" /></p>
+<p><strong>需要注意的是</strong>：每构建一棵完整的极小极大树，时间成本为$O(m^{n+1})$，m 为棋盘列数，n 为树的深度，而这一棵树只决定了一步的结果，因此时间成本是非常高的。这就是为什么要引入<strong>α-β 剪枝</strong>。</p>
+<h2 id="α-β-剪枝"><a href="#α-β-剪枝" class="headerlink" title="α-β 剪枝"></a>α-β 剪枝</h2><p>假设我们的树如下图所示</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/alpha-beta-tree.png" alt="image-20240525234108885" style="zoom: 25%;" /></p>
+<p>按照极小极大树的搜索方法，我们可以得到倒数第二层第一个节点的值为 0</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/alpha-beta-step-1.png" alt="image-20240525234243163" style="zoom:25%;" /></p>
+<p>这时我们可以得出如下结论：<strong>倒数第三层的最左边的节点（设为节点 A）的值不可能小于 0</strong>（因为要选子节点中最大的），于是我们接着向下深搜</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/alpha-beta-step-2.png" alt="image-20240525234513092" style="zoom:25%;" /></p>
+<p>搜索到叶子结点-3 之后，我们可以得知，<strong>倒数第二层从左往右数第二个节点的值不可能大于-3</strong>（因为要选择子节点中的最小值），结合之前我们得出 A 节点的值不可能小于 0 的结论，那么节点 A 的值到这里就可以确定为 0 了，而不需要进一步搜索到值为 3 的叶子节点，所以我们进行如下剪枝</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/alpha-prune.png" alt="image-20240526000743896" style="zoom:25%;" /></p>
+<p>这个剪枝操作剪掉了选择最小值的剩余步骤，称为 α 剪枝。节点 A 的值确定了之后，可以得到节点 B 的值不可能大于 0，所以我们接着往下搜索</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/beta-search.png" alt="image-20240526001837383" style="zoom:25%;" /></p>
+<p>得到 C 的值应该不小于 3，但是 B 的值不能超过 0，因此接下来对 C 的子节点的搜索就不需要了，可以剪枝，此次剪枝为先手节点的剪枝，称为 β 剪枝</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/beta-prune.png" alt="image-20240526002201369" style="zoom:25%;" /></p>
+<p>B 的值确定之后就可以得出结论，根节点的值不可能小于 0，于是继续向下搜索，然后剪枝，依次类推，最终搜索完成得到的树如下图所示</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/alpha-beta-result.png" alt="image-20240526002431577" style="zoom:25%;" /></p>
+<p>剪枝进行比较的时候注意需要和祖先比较，才能比较彻底的剪枝</p>
+<p>总结一下剪枝条件：</p>
+<ul>
+<li><p>后辈节点的 β 值 ≤ 祖先节点的 α 值时，α 剪枝</p>
+</li>
+<li><p>后辈节点的 α 值 ≥ 祖先节点的 β 值时，β 剪枝</p>
+</li>
+</ul>
+<p>附上部分代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// alpha-beta 剪枝</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">alphaScore</span><span class="params">(<span class="type">int</span> M, <span class="type">int</span> N, <span class="type">int</span> *top, <span class="type">int</span> **board, <span class="type">int</span> deep, <span class="type">int</span> alpha, <span class="type">int</span> beta)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// deep 为当前搜索的深度, 第一次调用为6, 每次递归减1, 直到为0到达叶子结点</span></span><br><span class="line">	<span class="comment">// 叶子结点的deep为0</span></span><br><span class="line">	<span class="keyword">if</span> (deep &lt;= <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">evaluate</span>(M, N, board);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">0</span>; col &lt; N; col++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (top[col] == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 模拟落子</span></span><br><span class="line">		<span class="type">int</span> row = top[col] - <span class="number">1</span>;</span><br><span class="line">		board[row][col] = <span class="number">2</span>;</span><br><span class="line">		top[col]--;</span><br><span class="line">		<span class="comment">// 递归调用</span></span><br><span class="line">		<span class="type">int</span> score = <span class="built_in">betaScore</span>(M, N, top, board, deep - <span class="number">1</span>, alpha, beta);</span><br><span class="line">		<span class="comment">// 撤销模拟落子</span></span><br><span class="line">		board[row][col] = <span class="number">0</span>;</span><br><span class="line">		top[col]++;</span><br><span class="line">		<span class="keyword">if</span> (score &gt; alpha)</span><br><span class="line">		&#123;</span><br><span class="line">			alpha = score;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (alpha &gt;= beta)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> alpha;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">betaScore</span><span class="params">(<span class="type">int</span> M, <span class="type">int</span> N, <span class="type">int</span> *top, <span class="type">int</span> **board, <span class="type">int</span> deep, <span class="type">int</span> alpha, <span class="type">int</span> beta)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">0</span>; col &lt; N; col++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (top[col] == <span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 模拟落子</span></span><br><span class="line">		<span class="type">int</span> row = top[col] - <span class="number">1</span>;</span><br><span class="line">		board[row][col] = <span class="number">1</span>;</span><br><span class="line">		top[col]--;</span><br><span class="line">		<span class="comment">// 递归调用</span></span><br><span class="line">		<span class="type">int</span> score = <span class="built_in">alphaScore</span>(M, N, top, board, deep - <span class="number">1</span>, alpha, beta);</span><br><span class="line">		<span class="comment">// 撤销模拟落子</span></span><br><span class="line">		board[row][col] = <span class="number">0</span>;</span><br><span class="line">		top[col]++;</span><br><span class="line">		<span class="keyword">if</span> (score &lt; beta)</span><br><span class="line">		&#123;</span><br><span class="line">			beta = score;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (beta &lt;= alpha)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> beta;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="估值函数"><a href="#估值函数" class="headerlink" title="估值函数"></a>估值函数</h2><p>我对四种情况（横/竖/正斜/反斜）进行了估值累加，代码如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">evaluate_window</span><span class="params">(<span class="type">const</span> <span class="type">int</span> window[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">int</span> score = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> player_count = std::<span class="built_in">count</span>(window, window + <span class="number">4</span>, <span class="number">2</span>);</span><br><span class="line">	<span class="type">int</span> empty_count = std::<span class="built_in">count</span>(window, window + <span class="number">4</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="type">int</span> opponent_count = std::<span class="built_in">count</span>(window, window + <span class="number">4</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (player_count == <span class="number">4</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score += <span class="number">1000</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (player_count == <span class="number">3</span> &amp;&amp; empty_count == <span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score += <span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (player_count == <span class="number">2</span> &amp;&amp; empty_count == <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score += <span class="number">10</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (opponent_count == <span class="number">3</span> &amp;&amp; empty_count == <span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score -= <span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (opponent_count == <span class="number">2</span> &amp;&amp; empty_count == <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score -= <span class="number">10</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (opponent_count == <span class="number">4</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		score -= <span class="number">1000</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> score;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">evaluate</span><span class="params">(<span class="type">int</span> M, <span class="type">int</span> N, <span class="type">int</span> **board)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="type">int</span> score = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Horizontal</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> row = <span class="number">0</span>; row &lt; M; ++row)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">0</span>; col &lt; N - <span class="number">3</span>; ++col)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> window[<span class="number">4</span>] = &#123;board[row][col], board[row][col + <span class="number">1</span>], board[row][col + <span class="number">2</span>], board[row][col + <span class="number">3</span>]&#125;;</span><br><span class="line">			score += <span class="built_in">evaluate_window</span>(window);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Vertical</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">0</span>; col &lt; N; ++col)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> row = <span class="number">0</span>; row &lt; M - <span class="number">3</span>; ++row)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> window[<span class="number">4</span>] = &#123;board[row][col], board[row + <span class="number">1</span>][col], board[row + <span class="number">2</span>][col], board[row + <span class="number">3</span>][col]&#125;;</span><br><span class="line">			score += <span class="built_in">evaluate_window</span>(window);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Positive Diagonal</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> row = <span class="number">0</span>; row &lt; M - <span class="number">3</span>; ++row)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">0</span>; col &lt; N - <span class="number">3</span>; ++col)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> window[<span class="number">4</span>] = &#123;board[row][col], board[row + <span class="number">1</span>][col + <span class="number">1</span>], board[row + <span class="number">2</span>][col + <span class="number">2</span>], board[row + <span class="number">3</span>][col + <span class="number">3</span>]&#125;;</span><br><span class="line">			score += <span class="built_in">evaluate_window</span>(window);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Negative Diagonal</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> row = <span class="number">0</span>; row &lt; M - <span class="number">3</span>; ++row)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="type">int</span> col = <span class="number">3</span>; col &lt; N; ++col)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="type">int</span> window[<span class="number">4</span>] = &#123;board[row][col], board[row + <span class="number">1</span>][col - <span class="number">1</span>], board[row + <span class="number">2</span>][col - <span class="number">2</span>], board[row + <span class="number">3</span>][col - <span class="number">3</span>]&#125;;</span><br><span class="line">			score += <span class="built_in">evaluate_window</span>(window);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> sc</span><br></pre></td></tr></table></figure>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42165981/article/details/103263211">https://blog.csdn.net/weixin_42165981/article/details/103263211</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hatiaa.github.io">Hatiaa</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hatiaa.github.io/2024/05/23/%E5%9B%9B%E5%AD%90%E6%A3%8B-%CE%B1%CE%B2%E5%89%AA%E6%9E%9D/">https://hatiaa.github.io/2024/05/23/四子棋-αβ剪枝/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://hatiaa.github.io" target="_blank">Hatiaa Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">强化学习</a><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/%CE%B1-%CE%B2%E5%89%AA%E6%9E%9D/">α-β剪枝</a></div><div class="post_share"><div class="social-share" data-image="/images/posts/connect-four-alpha-beta/cover.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="/pluginsSrc/butterfly-extsrc/sharejs/dist/css/share.min.css?v=1.1.3" media="print" onload="this.media='all'"><script src="/pluginsSrc/butterfly-extsrc/sharejs/dist/js/social-share.min.js?v=1.1.3" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/04/24/hatiaa-yu-%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/" title="Hatiaa Yu 的第一篇Blog"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/hatiaa-yu-first-blog/cover.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Hatiaa Yu 的第一篇Blog</div></div></a></div><div class="next-post pull-right"><a href="/2026/06/08/oh-my-zsh%E9%85%8D%E7%BD%AE/" title="Oh My Zsh 配置"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/oh-my-zsh-config/cover.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Oh My Zsh 配置</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="utterances-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/site/avatar.jpeg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Hatiaa</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Hatiaa"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Hatiaa" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:yuhaha1@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/588901801" target="_blank" title="Bilibili"><i class="fa-brands fa-bilibili" style="color: #00a1d6;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Blog established recently, welcome to visit and give advice.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E5%AD%90%E6%A3%8B%E6%B8%B8%E6%88%8F%E8%A7%84%E5%88%99"><span class="toc-text">四子棋游戏规则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%84%E5%88%99%E6%89%A9%E5%B1%95"><span class="toc-text">规则扩展</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="toc-text">算法实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%81%E5%B0%8F%E6%9E%81%E5%A4%A7%E6%A0%91"><span class="toc-text">极小极大树</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%CE%B1-%CE%B2-%E5%89%AA%E6%9E%9D"><span class="toc-text">α-β 剪枝</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%B0%E5%80%BC%E5%87%BD%E6%95%B0"><span class="toc-text">估值函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-text">参考文献</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/08/oh-my-zsh%E9%85%8D%E7%BD%AE/" title="Oh My Zsh 配置"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/oh-my-zsh-config/cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Oh My Zsh 配置"/></a><div class="content"><a class="title" href="/2026/06/08/oh-my-zsh%E9%85%8D%E7%BD%AE/" title="Oh My Zsh 配置">Oh My Zsh 配置</a><time datetime="2026-06-08T14:54:14.000Z" title="发表于 2026-06-08 22:54:14">2026-06-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/05/23/%E5%9B%9B%E5%AD%90%E6%A3%8B-%CE%B1%CE%B2%E5%89%AA%E6%9E%9D/" title="四子棋AI——α-β剪枝算法"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/connect-four-alpha-beta/cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="四子棋AI——α-β剪枝算法"/></a><div class="content"><a class="title" href="/2024/05/23/%E5%9B%9B%E5%AD%90%E6%A3%8B-%CE%B1%CE%B2%E5%89%AA%E6%9E%9D/" title="四子棋AI——α-β剪枝算法">四子棋AI——α-β剪枝算法</a><time datetime="2024-05-23T15:55:26.000Z" title="发表于 2024-05-23 23:55:26">2024-05-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/24/hatiaa-yu-%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/" title="Hatiaa Yu 的第一篇Blog"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/images/posts/hatiaa-yu-first-blog/cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hatiaa Yu 的第一篇Blog"/></a><div class="content"><a class="title" href="/2024/04/24/hatiaa-yu-%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87blog/" title="Hatiaa Yu 的第一篇Blog">Hatiaa Yu 的第一篇Blog</a><time datetime="2024-04-23T16:12:23.000Z" title="发表于 2024-04-24 00:12:23">2024-04-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By Hatiaa</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to <a href="https://hatiaa.github.io/">Hatiaa Blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/pluginsSrc/medium-zoom/dist/medium-zoom.min.js?v=1.1.0"></script><script src="/pluginsSrc/vanilla-lazyload/dist/lazyload.iife.min.js?v=17.8.8"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('/pluginsSrc/pangu/dist/browser/pangu.min.js?v=4.0.7')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>(() => {
+  const loadUtterances = () => {
+    let ele = document.createElement('script')
+    ele.id = 'utterances_comment'
+    ele.src = 'https://utteranc.es/client.js'
+    ele.setAttribute('repo', 'Hatiaa/Hatiaa.github.io')
+    ele.setAttribute('issue-term', 'pathname')
+    const nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'photon-dark' : 'github-light'
+    ele.setAttribute('theme', nowTheme)
+    ele.crossOrigin = 'anonymous'
+    ele.async = true
+    document.getElementById('utterances-wrap').appendChild(ele)
+  }
+
+  const utterancesTheme = theme => {
+    const iframe = document.querySelector('.utterances-frame')
+    if (iframe) {
+      const theme = theme === 'dark' ? 'photon-dark' : 'github-light'
+      const message = {
+        type: 'set-theme',
+        theme: theme
+      };
+      iframe.contentWindow.postMessage(message, 'https://utteranc.es');
+    }
+  }
+
+  btf.addGlobalFn('themeChange', utterancesTheme, 'utterances')
+
+  if ('Utterances' === 'Utterances' || !false) {
+    if (false) btf.loadComment(document.getElementById('utterances-wrap'), loadUtterances)
+    else loadUtterances()
+  } else {
+    window.loadOtherComment = loadUtterances
+  }
+})()</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="40" mobile="false" src="/pluginsSrc/butterfly-extsrc/dist/canvas-nest.min.js?v=1.1.3"></script><script src="/pluginsSrc/butterfly-extsrc/dist/activate-power-mode.min.js?v=1.1.3"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
